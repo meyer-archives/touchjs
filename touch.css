@@ -1,4 +1,4 @@
-/* @override http://cooper.local/portfolio/touch.css */
+/* @override http://cooper.local/iphone/touch.css */
 
 /* Trimmed-down Reset CSS */
 html,body,div,span,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,
@@ -17,10 +17,30 @@ body{
 }
 
 #container{
-	width: 100%;
-	height: 100%;
 	position: absolute;
 	background: #FFF;
+}
+
+/* Viewport sizes minus address bar */
+body.portrait #container{
+	width: 320px;
+	height: 417px;
+}
+
+body.landscape #container{
+	width: 480px;
+	height: 269px;
+}
+
+/* Home screen bookmark */
+body.portrait.standalone #container{
+	width: 320px;
+	height: 460px;
+}
+
+body.landscape.standalone #container{
+	width: 480px;
+	height: 300px;
 }
 
 #square-container{
@@ -31,36 +51,33 @@ body{
 
 #square{
 	position: relative;
-	height: 200px;
-	width: 200px;
+	height: 180px;
+	width: 180px;
 	left: -100px;
 	top: -100px;
-	color:#000;
-	background: #FFF;
-	font: 10px/16px Helvetica;
-	border: 1px solid #1285dc;
+	border: 1px solid rgba(0,0,0,0.65);
+	background-color: rgba(255,255,255,0.8);
 	overflow: hidden;
+	-webkit-box-shadow: #000000 0 0 10px;
+	padding-top: 16px;
+	padding-left: 20px;
+	line-height: 16px;
+	font-size: 14px;
+	padding-bottom: 4px;
 }
 
-#square strong{
+#square b{
 	display: inline-block;
-	width: 30px;
+	width: 50px;
+	font-family: "Courier New", Courier, mono;
 }
 
 #square span{
 	display: inline-block;
-	width: 50px;
+	width: 95px;
 	text-align: right;
 }
 
-body.portrait{
-	background: #F00;
-}
-
-body.landscape{
-	background: #FF0;
-}
-
-#square p{
-	padding: 20px 20px 0;
+#square ul{
+	margin-bottom: 6px;
 }

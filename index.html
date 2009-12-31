@@ -1,17 +1,47 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<link rel="apple-touch-startup-image" href="./startup.png">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="apple-touch-icon" href="./apple-touch-icon-precomposed.png"/>
+	<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-precomposed.png"/>
+
 	<title>Touch test</title>
 	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+
 	<script src="xui-min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="touch.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" href="touch.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script type="text/javascript" charset="utf-8">
+		x$(window).load(function(){
+			x$("a#update").click(function(){
+				console.log( window.innerWidth+" x "+window.innerHeight );
+			});
+		});
+	</script>
 </head>
 <body>
 	<div id="container">
 		<div id="square-container">
 			<div id="square">
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<ul>
+					<li id="rotate-old"><b>rOld:</b><span>0</span>&deg;</li>
+					<li id="rotate-initial"><b>rInit:</b><span>0</span>&deg;</li>
+					<li id="rotate-new"><b>rNew:</b><span>0</span>&deg;</li>
+					<li id="rotate-delta"><b>r&Delta;:</b><span>0</span>&deg;</li>
+				</ul>
+				<ul>
+					<li id="pinch-initial"><b>pInit:</b><span>0</span>px</li>
+					<li id="pinch-delta"><b>p&Delta;:</b><span>0</span>px</li>
+				</ul>
+				<ul>
+					<li id="swipe-vector"><b>sV(r,&theta;):</b><span>0px, 0</span>&deg;</li>
+					<li id="swipe-direction"><b>sDir:</b><span>none</span></li>
+				</ul>
+				<ul>
+					<li id="event-duration"><b>eTime:</b><span>0</span>ms</li>
+				</ul>
 			</div>
 		</div>
 		<div id="content">
