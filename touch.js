@@ -1,5 +1,11 @@
 //// CONFIG
 
+function Finger(){
+	// Empty arrays
+	this.x = [],
+	this.y = []
+}
+
 device = {
 	finger1: false,
 	finger2: false,
@@ -33,9 +39,7 @@ device = {
 		angle: 0, // swipe angle // TODO: Round to the nearest X degrees?
 		direction: "" // human-readable version of the swipe angle: up, down, etc.
 	},
-	page: {
-		orientation: false
-	},
+
 	type: false,
 	orientation: false,
 	rotating: false,
@@ -73,20 +77,21 @@ function updateOrientation(){
 			// What a goofy browser you must be using.
 		break;
 	}
-	if( window.navigator.standalone ){
-		setTimeout(function() { window.scrollTo(0, 0) }, 100);
+	if( window.navigator.standalone ){ // Launched from the home screen
+		setTimeout(function() { window.scrollTo(0, 0) }, 100); // Scroll to top
 	} else {
-		setTimeout(function() { window.scrollTo(0, 1) }, 100);
+		setTimeout(function() { window.scrollTo(0, 1) }, 100); // Scroll past the address bar & debug menu
 	}
 }
 
 x$(window).load(function(e){
+	// TODO: Android support (?)
 	if( navigator.userAgent.match(/iPhone/i) ){
 		device.type = "iphone";
 	} else if( navigator.userAgent.match(/iPod/i) ){
 		device.type = "ipod";
 	} else {
-		device.type = "unknown";
+		device.type = "unknown"; // Desktop computer or other browser/device
 	}
 	
 	if( window.navigator.standalone ){
@@ -103,39 +108,53 @@ x$(window).load(function(e){
 		device.touch.start = new Date().getTime();
 		device.touching = true;
 		if( e.touches.length == 1 ){
-			device.finger1 = e.touches[0];
+			var t1 = e.touches[0];
+
+			device.finger1 = new Finger();
 
 			//// Swipe detection
-			device.swipe.initial.x = e.touches[0].pageX;
-			device.swipe.initial.y = e.touches[0].pageY;
+			// First info
+			device.finger1.x.push(t1.pageX);
+			device.finger1.y.push(t1.pageY);
 		} else
 		if( e.touches.length == 2 ){
-			device.finger1 = e.touches[0];
-			device.finger2 = e.touches[1];
+			var t1 = e.touches[0];
+			var t2 = e.touches[1];
 
-			var diffX = device.finger2.pageX-device.finger1.pageX;
-			var diffY = device.finger2.pageY-device.finger1.pageY;
+			device.finger1 = new Finger();
+			device.finger2 = new Finger();
 
-			device.rotate.prev = device.rotate.final;
+			var diffX = t2.pageX-t1.pageX;
+			var diffY = t2.pageY-t1.pageY;
+
+			device.rotate.prev = device.rotate.final; // Old final rotation = previous rotation
 			device.rotate.initial = Math.round( (Math.atan2(diffX,diffY)/(2*Math.PI))*360 ) + 180;
+			// Length of the hypotenuse, given a and b
 			device.pinch.initial =  Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
 		}
 	})
 	.touchmove(function(e){
 		e.preventDefault();
 		if( e.touches.length == 1 ){ // One finger
-			device.finger1 = e.touches[0];
+			var t1 = e.touches[0];
 			//// Swipe detection
-			device.swipe.final.x = e.touches[0].pageX;
-			device.swipe.final.y = e.touches[0].pageY;
-			
-			var diffX = device.swipe.final.x-device.swipe.initial.x;
-			var diffY = device.swipe.final.y-device.swipe.initial.y;
+			var prevX = device.finger1.x[device.finger1.x.length-1];
+			var prevY = device.finger1.y[device.finger1.y.length-1];
 
-			device.swipe.delta = Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
-			device.swipe.angle = ((Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ) + 180) % 360);
+			var diffX = prevX-t1.pageX;
+			var diffY = prevY-t1.pageY;
 
-			if( !device.swiping && device.swipe.delta > 20 )
+			var delta = Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
+			if( delta > 20 ){
+				// Record a new point
+				device.finger1.x.push(t1.pageX);
+				device.finger1.y.push(t1.pageY);
+				var angle = ((Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ) + 180) % 360);
+				var point = "<div class='point' style='position:absolute;top:"+t1.pageY+"px;left:"+t1.pageX+"px;-webkit-transform:rotate(-"+angle+"deg)'><span>&darr;</span></div>";
+				x$("body").html("after",point);
+			}
+
+//			if( !device.swiping && device.swipe.delta > 20 )
 				device.swiping = true;
 
 			if( device.swiping ) {
@@ -167,11 +186,11 @@ x$(window).load(function(e){
 			}
 		} else
 		if( e.touches.length == 2 ){
-			device.finger1 = e.touches[0]; // Finger 1
-			device.finger2 = e.touches[1]; // Finger 2
+			t1 = e.touches[0]; // Finger 1
+			t2 = e.touches[1]; // Finger 2
 
-			var diffX = device.finger2.pageX - device.finger1.pageX;
-			var diffY = device.finger2.pageY - device.finger1.pageY;
+			var diffX = t2.pageX - t1.pageX;
+			var diffY = t2.pageY - t1.pageY;
 
 			//// Rotation detection
 			device.rotate.delta = device.rotate.initial - ((Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ) + 180) % 360);
@@ -179,8 +198,7 @@ x$(window).load(function(e){
 			// The total amount of rotation applied to the object, based on the initial rotate.
 			device.rotate.final = (device.rotate.prev + device.rotate.delta + 360) % 360;
 
-			// TODO: Coefficient of rotation should increase the closer the fingers are together
-			if( !device.rotating && Math.abs( device.rotate.delta ) > 11 )
+//			if( !device.rotating && Math.abs( device.rotate.delta ) > 10 )
 				device.rotating = true;
 
 			if( device.rotating )
@@ -199,15 +217,12 @@ x$(window).load(function(e){
 		}
 	})
 	.touchend(function(){
-		if( device.touch.start > 0 )
-			device.touch.duration = new Date().getTime() - device.touch.start;
-		x$("#event-duration span").html(device.touch.duration+"");
-		device.touch.start = 0;
-
+		x$(".point").remove();
 		device.touching = false;
 		device.rotating = false;
 		device.swiping = false;
 		device.swipe.direction = "";
+
 		device.finger1 = false;
 		device.finger2 = false;
 	});

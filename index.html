@@ -1,18 +1,22 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<link rel="apple-touch-startup-image" href="./startup.png">
+	<!-- iPhone meta info -->
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+
+	<link rel="apple-touch-startup-image" href="./startup.png">
 	<link rel="apple-touch-icon" href="./apple-touch-icon-precomposed.png"/>
 	<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-precomposed.png"/>
 
-	<title>Touch test</title>
-	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+	<title>Touch Test</title>
 
 	<script src="xui-min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="touch.js" type="text/javascript" charset="utf-8"></script>
-	<link rel="stylesheet" href="touch.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+	<link rel="stylesheet" href="touch.css" type="text/css" media="screen" title="" charset="utf-8">
+
 	<script type="text/javascript" charset="utf-8">
 		x$(window).load(function(){
 			x$("a#update").click(function(){
@@ -22,6 +26,8 @@
 	</script>
 </head>
 <body>
+	<div id="arrow-container">
+	</div>
 	<div id="container">
 		<div id="square-container">
 			<div id="square">
