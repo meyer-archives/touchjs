@@ -1,10 +1,3 @@
-Array.prototype.max = function(){
-    return Math.max.apply( this );
-}
-Array.prototype.min = function(){
-    return Math.min.apply( this );
-}
-
 var log = {
 	add: function(msg){
 		x$("#content-inner ul").html("top",msg+"");
@@ -28,8 +21,9 @@ var device = {
 // Nice-looking custom events
 var event = {
 	// Some code I snarfed from here and modified : http://bit.ly/6s0rhu
-	fire: function(eventName) {
+	fire: function(eventName,payload) {
 		var e = document.createEvent("Events");
+		e.data = payload;
 		e.initEvent(eventName, true, true);
 		document.dispatchEvent(e);
 	},
@@ -38,16 +32,50 @@ var event = {
 	}
 }
 
+function swipeDirection( angle ){
+	if( angle > 22.5 && angle < 67.5 ){ // 45
+		return "up-left";
+	} else
+	if( angle > 67.5 && angle < 112.5 ){ // 90
+		return "left";
+	} else
+	if( angle > 112.5 && angle < 157.5 ){ // 135
+		return "down-left";
+	} else
+	if( angle > 157.5 && angle < 202.5 ){ // 180
+		return "down";
+	} else
+	if( angle > 202.5 && angle < 247.5 ){ // 225
+		return "down-right";
+	} else
+	if( angle > 247.5 && angle < 292.5 ){ // 270
+		return "right";
+	} else
+	if( angle > 292.5 && angle < 337.5 ){ // 315
+		return "up-right";
+	} else
+	if( angle > 337.5 || angle < 22.5 ){ // 360
+		return "up";
+	} else {
+		return false;
+	}
+}
+
 // Basic "finger" class
 function Finger(touchObject){
 	// Empty arrays
 	this.x = [];
 	this.y = [];
-	this.angle = []; // first angle can't be set, silly
+	this.angle = [];
 	this.id = touchObject.identifier;
+	this.totalDistance = 0,
+	this.toString = function(){
+		return "[Finger Object:"+this.id+"]";
+	}
 
 	var initX = touchObject.pageX;
 	var initY = touchObject.pageY;
+
 
 	this.addPoint = function(){
 		var prevX, prevY;
@@ -68,14 +96,43 @@ function Finger(touchObject){
 
 		var delta = Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
 
-		if( delta > 10 ){
+		if( delta > 2 ){
+			this.totalDistance += delta;
 
 			var angle = (360 - (Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ))) % 360;
+
+			var a = {
+				sum: 0,
+				max: Math.max.apply( Math, this.angle ),
+				min: Math.min.apply( Math, this.angle ),
+				avg: 0,
+				angle: angle,
+				distance: this.totalDistance,
+				direction: false
+			}
 
 			// Record a new point
 			this.x.push(newX);
 			this.y.push(newY);
 			this.angle.push(angle);
+
+			for(q = 0; q < this.angle.length; q++){
+				if(
+					a.max > 270 &&
+					a.min < 90 &&
+					this.angle[q] > 180
+				) // Swiping up-ish
+					this.angle[q] -= 360;
+				a.sum += this.angle[q];
+			}
+			a.avg = a.sum/this.angle.length;
+			a.direction = swipeDirection(a.avg);
+			if(
+				Math.abs(a.avg-a.min) < 25 &&
+				Math.abs(a.avg-a.max) < 25
+			){
+				event.fire("swipeGesture",a);
+			}
 
 			// Debug
 			var point = document.createElement('div');
@@ -88,7 +145,7 @@ function Finger(touchObject){
 					position:"absolute"
 				})
 				.setStyle("-webkit-transform","rotate("+angle+"deg)")
-				.html("<span>"+angle+"</span>");
+				.html("<span>"+touchObject.identifier+"</span>");
 			x$("body").html( "after", point );
 		} else {
 			return false;
@@ -139,12 +196,12 @@ x$(window).load(function(e){
 	x$(document)
 	.touchstart( function(e){
 		e.preventDefault();
-		log.reset();
+		if( e.touches.length == 1 )
+			log.reset();
 		for( i in e.changedTouches){
 			var t = e.changedTouches[i];
 			if( typeof(t.identifier) != "undefined" ){
 				device.touch[t.identifier] = new Finger(t);
-				log.add("Creating new object: "+t.identifier);
 			}
 		}
 	})
@@ -155,57 +212,25 @@ x$(window).load(function(e){
 	})
 	.touchend(function(e){
 		for( i in e.changedTouches ){
-			var id = e.changedTouches[i].identifier;
-			if( typeof(id) != "undefined" ){
-				x$(".point.id"+id).remove();
-				device.touch.splice(id, 1);
-				log.add("Destroying object: "+id);
+			var t = e.changedTouches[i];
+			if( typeof(t.identifier) != "undefined" ){
+				x$(".point.id"+t.identifier).remove();
+				device.touch.splice(t.identifier, 1);
 			}
 		}
 		if( e.touches.length == 0 ){
-			// Destroy everything!!!
-			device.touch = [];
+//			device.touch = [];
 		}
-	});
+	})
+	// 2-finger gestures
+	.gesturestart(function(e){
+	})
+	.gesturechange(function(e){
+	})
+	.gestureend(function(e){
+	})
 });
 
-// Extra
-/*
-
-// touchstart
-device.rotate.initial = Math.round( (Math.atan2(diffX,diffY)/(2*Math.PI))*360 ) + 180;
-device.pinch.initial =  Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
-
-// touchmove
-device.rotate.delta = device.rotate.initial - ((Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ) + 180) % 360);
-device.rotate.final = (device.rotate.prev + device.rotate.delta + 360) % 360;
-device.pinch.final = Math.floor( Math.sqrt( diffX*diffX + diffY*diffY ) );
-device.pinch.delta = device.pinch.final - device.pinch.initial;
-device.pinch.angle = device.rotate.initial;
-
-if( device.swipe.angle > 35 && device.swipe.angle < 55 ){ // 45
-	device.swipe.direction = "up-left";
-} else
-if( device.swipe.angle > 80 && device.swipe.angle < 100 ){ // 90
-	device.swipe.direction = "left";
-} else
-if( device.swipe.angle > 125 && device.swipe.angle < 145 ){ // 135
-	device.swipe.direction = "down-left";
-} else
-if( device.swipe.angle > 170 && device.swipe.angle < 190 ){ // 180
-	device.swipe.direction = "down";
-} else
-if( device.swipe.angle > 215 && device.swipe.angle < 235 ){ // 225
-	device.swipe.direction = "down-right";
-} else
-if( device.swipe.angle > 260 && device.swipe.angle < 280 ){ // 270
-	device.swipe.direction = "right";
-} else
-if( device.swipe.angle > 305 && device.swipe.angle < 325 ){ // 315
-	device.swipe.direction = "up-right";
-} else
-if( device.swipe.angle > 350 || device.swipe.angle < 10 ){ // 360
-	device.swipe.direction = "up";
-}
-
-*/
+event.listen("swipeGesture",function(e){
+	x$("#content").html("<p>Direction: "+e.data.direction+"</p><p>Distance: "+e.data.distance+"px</p><p>Angle: "+e.data.angle+"deg</p><p>Average: "+e.data.avg+"deg</p>");
+});
