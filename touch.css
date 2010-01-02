@@ -49,35 +49,61 @@ body.landscape.standalone #container{
 	left: 50%;
 }
 
-#square{
+#container{
+	height: 100%;
+	width: 100%;
+}
+
+#content{
 	position: relative;
-	height: 180px;
-	width: 180px;
-	left: -100px;
-	top: -100px;
+	width: 100%;
+	top: 50%;
+	left: 50%;
+/*	-webkit-box-shadow: #000000 0 0 10px;*/
+}
+
+#content #content-inner{
+	position: absolute;
+	top: -130px;
+	left: -130px;
+	width: 260px;
+	height: 260px;
 	border: 1px solid rgba(0,0,0,0.65);
 	background-color: rgba(255,255,255,0.8);
+}
+
+#content-inner ul{
+	margin: 12px 15px;
 	overflow: hidden;
-/*	-webkit-box-shadow: #000000 0 0 10px;*/
-	padding-top: 16px;
-	padding-left: 20px;
-	line-height: 16px;
-	font-size: 14px;
-	padding-bottom: 4px;
+	height: 236px;
+	width: 230px;
 }
 
-#square b{
+#content b{
 	display: inline-block;
-	width: 50px;
-	font-family: "Courier New", Courier, mono;
+	width: 100px;
 }
 
-#square span{
+#content span{
 	display: inline-block;
-	width: 95px;
+	width: 100px;
 	text-align: right;
 }
 
-#square ul{
-	margin-bottom: 6px;
+div.point{
+	position: absolute;
+}
+
+div.point span{
+	position: absolute;
+	height: 80px;
+	width: 80px;
+	top: -40px;
+	left: -40px;
+	display: block;
+	background: rgba(0,0,0,0.10);
+	color: #FFF;
+	text-align: center;
+	letter-spacing: -1px;
+	font: bold 9px/80px "Lucida Grande", Lucida, Verdana, sans-serif;
 }
