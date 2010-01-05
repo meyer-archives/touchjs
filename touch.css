@@ -10,7 +10,7 @@ blockquote,q{ quotes: none }
 blockquote:before,blockquote:after,q:before,q:after{ content:''; content: none; }
 :focus{ outline: 0; }
 table{ border-collapse: collapse; border-spacing: 0; }
-*{ -webkit-user-select: none; -webkit-text-size-adjust: none; }
+*{ -webkit-user-select: none; -webkit-text-size-adjust: none; -webkit-tap-higlight-color: transparent; }
 
 body{
 	font: 12px/16px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
@@ -88,8 +88,8 @@ div.point span{
 	top: -40px;
 	left: -40px;
 	display: block;
-	background: rgba(0,0,0,0.10);
-	color: #FFF;
+	background: rgba(220,220,220,0.10);
+	color: #000;
 	text-align: center;
 	letter-spacing: -1px;
 	font: bold 9px/80px "Lucida Grande", Lucida, Verdana, sans-serif;

@@ -32,35 +32,6 @@ var event = {
 	}
 }
 
-function swipeDirection( angle ){
-	if( angle > 22.5 && angle < 67.5 ){ // 45
-		return "up-left";
-	} else
-	if( angle > 67.5 && angle < 112.5 ){ // 90
-		return "left";
-	} else
-	if( angle > 112.5 && angle < 157.5 ){ // 135
-		return "down-left";
-	} else
-	if( angle > 157.5 && angle < 202.5 ){ // 180
-		return "down";
-	} else
-	if( angle > 202.5 && angle < 247.5 ){ // 225
-		return "down-right";
-	} else
-	if( angle > 247.5 && angle < 292.5 ){ // 270
-		return "right";
-	} else
-	if( angle > 292.5 && angle < 337.5 ){ // 315
-		return "up-right";
-	} else
-	if( angle > 337.5 || angle < 22.5 ){ // 360
-		return "up";
-	} else {
-		return false;
-	}
-}
-
 // Basic "finger" class
 function Finger(touchObject){
 	// Empty arrays
@@ -80,7 +51,7 @@ function Finger(touchObject){
 	this.addPoint = function(){
 		var prevX, prevY;
 
-		if( this.angle.length == 0 ){
+		if( this.x.length == 0 ){
 			prevX = initX;
 			prevY = initY;
 		} else {
@@ -94,59 +65,48 @@ function Finger(touchObject){
 		var diffX = prevX-newX;
 		var diffY = prevY-newY;
 
-		var delta = Math.round( Math.sqrt( diffX*diffX + diffY*diffY ) );
+		var delta = Math.sqrt( diffX*diffX + diffY*diffY );
 
-		if( delta > 2 ){
+		if( delta > 10 ){
 			this.totalDistance += delta;
 
-			var angle = (360 - (Math.floor( ( Math.atan2(diffX,diffY)/Math.PI ) * 180 ))) % 360;
-
-			var a = {
-				sum: 0,
-				max: Math.max.apply( Math, this.angle ),
-				min: Math.min.apply( Math, this.angle ),
-				avg: 0,
-				angle: angle,
-				distance: this.totalDistance,
-				direction: false
-			}
+//			var angle = (360 - ( Math.atan2(diffX,diffY)/Math.PI * 180 )) % 360;
 
 			// Record a new point
 			this.x.push(newX);
 			this.y.push(newY);
-			this.angle.push(angle);
+//			this.angle.push(angle);
 
+			var a = {
+				sum: 0,
+//				max: this.angle.length > 1 ? Math.max.apply( Math, this.angle ) : this.angle[0],
+//				min: this.angle.length > 1 ? Math.min.apply( Math, this.angle ) : this.angle[0],
+				x: newX,
+				y: newY,
+				diffX: diffX,
+				diffY: diffY,
+//				avg: 0,
+//				angle: angle,
+				id: touchObject.identifier,
+				totalDistance: this.totalDistance,
+				totalPoints: this.x.length == this.y.length ? this.x.length : "[error]"
+//				finalAngle: (360 - ( Math.atan2(initX-newX,initY-newY)/Math.PI ) * 180 ) % 360
+			}
+/*
 			for(q = 0; q < this.angle.length; q++){
 				if(
 					a.max > 270 &&
 					a.min < 90 &&
 					this.angle[q] > 180
-				) // Swiping up-ish
+				){ // Swiping up-ish
 					this.angle[q] -= 360;
+				}
 				a.sum += this.angle[q];
 			}
-			a.avg = a.sum/this.angle.length;
-			a.direction = swipeDirection(a.avg);
-			if(
-				Math.abs(a.avg-a.min) < 25 &&
-				Math.abs(a.avg-a.max) < 25
-			){
-				event.fire("swipeGesture",a);
-			}
 
-			// Debug
-			var point = document.createElement('div');
-			x$(point)
-				.addClass("point")
-				.addClass("id"+touchObject.identifier)
-				.css({
-					top:newY+"px",
-					left:newX+"px",
-					position:"absolute"
-				})
-				.setStyle("-webkit-transform","rotate("+angle+"deg)")
-				.html("<span>"+touchObject.identifier+"</span>");
-			x$("body").html( "after", point );
+			a.avg = a.sum/this.angle.length;
+*/
+			event.fire("swipeGesture",a);
 		} else {
 			return false;
 		}
@@ -214,13 +174,13 @@ x$(window).load(function(e){
 		for( i in e.changedTouches ){
 			var t = e.changedTouches[i];
 			if( typeof(t.identifier) != "undefined" ){
-				x$(".point.id"+t.identifier).remove();
 				device.touch.splice(t.identifier, 1);
 			}
 		}
 		if( e.touches.length == 0 ){
 //			device.touch = [];
 		}
+		console.log("-----");
 	})
 	// 2-finger gestures
 	.gesturestart(function(e){
@@ -232,5 +192,24 @@ x$(window).load(function(e){
 });
 
 event.listen("swipeGesture",function(e){
-	x$("#content").html("<p>Direction: "+e.data.direction+"</p><p>Distance: "+e.data.distance+"px</p><p>Angle: "+e.data.angle+"deg</p><p>Average: "+e.data.avg+"deg</p>");
+	var debugHTML = "";
+	for( i in e.data ){
+		debugHTML = debugHTML + "<p>"+i+": "+e.data[i]+"</p>";
+	}
+	x$("#content").html(debugHTML+"");
+	// Debug
+	var point = document.createElement('div');
+	x$(point)
+		.addClass("point")
+		.addClass("id"+e.data.id)
+		.css({
+			top:e.data.y+"px",
+			left:e.data.x+"px",
+			position:"absolute"
+		})
+//		.setStyle("-webkit-transform","rotate("+e.data.angle+"deg)")
+		.html("<span>"+e.data.id+"</span>");
+
+	x$("body").html( "after", point );
+
 });
