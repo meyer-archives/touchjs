@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>Animation Test</title>
+	<style type="text/css" media="screen">
+		#box{
+			height: 80px;
+			width: 80px;
+			display: block;
+			position: absolute;
+			top: 200px;
+			left: 200px;
+		}
+	</style>
+	<script src="xui-min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		x$(window).load(function(){
+			x$("#box").click(function(){
+				x$('#box').tween({ background:'red', duration:1.5 });
+			});
+		});
+	</script>
+</head>
+<body>
+	<div id="box" style="background:blue"></div>
+</body>
+</html>
