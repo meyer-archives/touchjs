@@ -1,29 +1,30 @@
-var log = {
-	add: function(msg){
-		x$("#content-inner ul").html("top",msg+"");
-	},
-	reset: function(){
-		x$("#content-inner ul").html("");
-	}
-}
+/************************************************
+
+	TOUCH.JS
+
+	This hotness brought to you by:
+
+	Michael Meyer
+	mikemeyer@gmail.com
+	twitter.com/mikemeyer
+
+	Steal it, improve it, then let me know.
+
+************************************************/
+
+var touch;
+var swiping = false;
 
 var device = {
-	touch: [],
 	// Read-only meta info
 	type: false,
 	orientation: false,
-	rotating: false,
-	pinching: false,
-	swiping: false,
-	touching: false
 }
 
-// Nice-looking custom events
 var event = {
 	// Some code I snarfed from here and modified : http://bit.ly/6s0rhu
 	fire: function(eventName,payload) {
 		var e = document.createEvent("Events");
-		e.data = payload;
 		e.initEvent(eventName, true, true);
 		document.dispatchEvent(e);
 	},
@@ -32,21 +33,28 @@ var event = {
 	}
 }
 
-// Basic "finger" class
-function Finger(touchObject){
+// Number crunching for single-finger swipes
+function Touch(touchObject){
 	// Empty arrays
 	this.x = [];
 	this.y = [];
-	this.angle = [];
-	this.id = touchObject.identifier;
-	this.totalDistance = 0,
-	this.toString = function(){
-		return "[Finger Object:"+this.id+"]";
-	}
+	this.id = touchObject.identifier; // this may come in handy
+	this.distanceTotal = 0;
 
+	// Angle Data
+	this.angle = [];
+//	this.angleMax = 0;		// Maximum angle between prevX/Y and newX/Y
+//	this.angleMin = 0;		// Minimum angle between prevX/Y and newX/Y
+	this.angleFinal = 0;	// Compare to angleAvg
+//	this.angleAvg = 0;
+//	var angleTotal = 0;		// Used for the average angle
+
+	// Number of pixels between points
+	var pointPrecision = 10;
+
+	// Used for the first angleDelta
 	var initX = touchObject.pageX;
 	var initY = touchObject.pageY;
-
 
 	this.addPoint = function(){
 		var prevX, prevY;
@@ -67,46 +75,19 @@ function Finger(touchObject){
 
 		var delta = Math.sqrt( diffX*diffX + diffY*diffY );
 
-		if( delta > 10 ){
-			this.totalDistance += delta;
+		if( delta > pointPrecision ){
+			this.distanceTotal += delta;
 
-//			var angle = (360 - ( Math.atan2(diffX,diffY)/Math.PI * 180 )) % 360;
+			var angleDelta = (360 - ( Math.atan2(diffX,diffY)/Math.PI * 180 )) % 360;
 
 			// Record a new point
 			this.x.push(newX);
 			this.y.push(newY);
-//			this.angle.push(angle);
+			this.angle.push(angleDelta);
 
-			var a = {
-				sum: 0,
-//				max: this.angle.length > 1 ? Math.max.apply( Math, this.angle ) : this.angle[0],
-//				min: this.angle.length > 1 ? Math.min.apply( Math, this.angle ) : this.angle[0],
-				x: newX,
-				y: newY,
-				diffX: diffX,
-				diffY: diffY,
-//				avg: 0,
-//				angle: angle,
-				id: touchObject.identifier,
-				totalDistance: this.totalDistance,
-				totalPoints: this.x.length == this.y.length ? this.x.length : "[error]"
-//				finalAngle: (360 - ( Math.atan2(initX-newX,initY-newY)/Math.PI ) * 180 ) % 360
-			}
-/*
-			for(q = 0; q < this.angle.length; q++){
-				if(
-					a.max > 270 &&
-					a.min < 90 &&
-					this.angle[q] > 180
-				){ // Swiping up-ish
-					this.angle[q] -= 360;
-				}
-				a.sum += this.angle[q];
-			}
+			this.angleFinal = (360 - ( Math.atan2(initX-newX,initY-newY)/Math.PI ) * 180 ) % 360;
 
-			a.avg = a.sum/this.angle.length;
-*/
-			event.fire("swipeGesture",a);
+			return true;
 		} else {
 			return false;
 		}
@@ -156,31 +137,31 @@ x$(window).load(function(e){
 	x$(document)
 	.touchstart( function(e){
 		e.preventDefault();
-		if( e.touches.length == 1 )
-			log.reset();
-		for( i in e.changedTouches){
-			var t = e.changedTouches[i];
-			if( typeof(t.identifier) != "undefined" ){
-				device.touch[t.identifier] = new Finger(t);
-			}
+		if( e.touches.length == 1 ){
+			// Aw, that's touching. Ba dum, tsh.
+			touch = new Touch(e.touches[0]);
+			event.fire("swipeStart");
 		}
 	})
 	.touchmove(function(e){
 		e.preventDefault();
-		for( i in device.touch )
-			device.touch[i].addPoint();
-	})
-	.touchend(function(e){
-		for( i in e.changedTouches ){
-			var t = e.changedTouches[i];
-			if( typeof(t.identifier) != "undefined" ){
-				device.touch.splice(t.identifier, 1);
+		// Gesture events take over from here
+		if( e.touches.length > 1 ){
+			event.fire("swipeEnd");
+			touch = false;
+		}
+
+		if( touch ){ // if we started with one finger
+			if( touch.addPoint() ){
+				event.fire("swipeMove");
 			}
 		}
-		if( e.touches.length == 0 ){
-//			device.touch = [];
+	})
+	.touchend(function(e){
+		if( touch ){
+			event.fire("swipeEnd");
+			touch = false;
 		}
-		console.log("-----");
 	})
 	// 2-finger gestures
 	.gesturestart(function(e){
@@ -191,24 +172,41 @@ x$(window).load(function(e){
 	})
 });
 
-event.listen("swipeGesture",function(e){
-	var debugHTML = "";
-	for( i in e.data ){
-		debugHTML = debugHTML + "<p>"+i+": "+e.data[i]+"</p>";
+event.listen("swipeEnd",function(e){
+	x$(".point").remove();
+});
+
+event.listen("swipeMove",function(e){
+	var debugHTML = [];
+	for( i in this.touch ){
+		switch( typeof(this.touch[i]) ){
+			case "function":
+				debugHTML.push( "function: " + i + "();" );
+			break;
+			case "object": // probably an array
+				debugHTML.push( i + ": " + this.touch[i][this.touch[i].length-1] );
+			break;
+			case "number":
+				debugHTML.push( i + ": " + this.touch[i].toFixed(2) );
+			break;
+			default:
+				debugHTML.push( i + ": " + this.touch[i] );
+			break;
+		}
 	}
-	x$("#content").html(debugHTML+"");
-	// Debug
+
+	x$("#content").html((debugHTML.join("<br>"))+"");
+
 	var point = document.createElement('div');
 	x$(point)
 		.addClass("point")
-		.addClass("id"+e.data.id)
 		.css({
-			top:e.data.y+"px",
-			left:e.data.x+"px",
+			top:touch.y[touch.y.length-1]+"px",
+			left:touch.x[touch.x.length-1]+"px",
 			position:"absolute"
 		})
-//		.setStyle("-webkit-transform","rotate("+e.data.angle+"deg)")
-		.html("<span>"+e.data.id+"</span>");
+		.setStyle("-webkit-transform","rotate("+touch.angle[touch.angle.length-1]+"deg)")
+		.html("<span>"+touch.angle[touch.angle.length-1].toFixed(2)+"</span>");
 
 	x$("body").html( "after", point );
 
