@@ -17,80 +17,47 @@ body{
 }
 
 #container{
+	height: 480px;
+	width: 480px;
 	position: absolute;
+	top: 0;
+	left: 0;
 	background: #FFF;
 }
 
-/* Viewport sizes minus address bar */
-body.portrait #container{
-	width: 320px;
-	height: 417px;
-}
-
-body.landscape #container{
-	width: 480px;
-	height: 269px;
-}
-
-/* Home screen bookmark */
-body.portrait.standalone #container{
-	width: 320px;
-	height: 460px;
-}
-
-body.landscape.standalone #container{
-	width: 480px;
-	height: 300px;
-}
-
-#square-container{
+canvas#graph{
 	position: absolute;
-	top: 50%;
-	left: 50%;
+	z-index: 1000;
 }
 
-#container{
-	height: 100%;
-	width: 100%;
-}
-
-#content{
-	width: 100%;
-/*	-webkit-box-shadow: #000000 0 0 10px;*/
-}
-
-#content-inner ul{
-	margin: 12px 15px;
-	overflow: hidden;
-	height: 236px;
-	width: 230px;
-}
-
-#content b{
-	display: inline-block;
-	width: 100px;
-}
-
-#content span{
-	display: inline-block;
-	width: 100px;
-	text-align: right;
-}
-
-div.point{
+ul#cards{
 	position: absolute;
+	top: 0;
+	left: 0;
 }
 
-div.point span{
+ul#cards.ready li{
+	-webkit-transition: all 300ms ease-in-out;
+}
+
+/* About Cassia: 75h 68v */
+/* Gallery: 40h 101v */
+
+ul#cards li{
+	background: rgba(0,0,0,.3);
+	-webkit-border-radius: 5px;
 	position: absolute;
-	height: 80px;
-	width: 80px;
-	top: -40px;
-	left: -40px;
-	display: block;
-	background: rgba(220,220,220,0.10);
-	color: #000;
+	top: 10px;
+	left: 10px;
+	line-height: 300px;
+	font-size: 100px;
+	font-weight: bold;
 	text-align: center;
-	letter-spacing: -1px;
-	font: bold 9px/80px "Lucida Grande", Lucida, Verdana, sans-serif;
+	color: #FFF;
+	height: 300px;
+	width: 300px;
+}
+
+ul#cards li.transitioning{
+	-webkit-transition: all .5s ease-in-out;
 }

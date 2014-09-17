@@ -28,7 +28,7 @@
 					ctx.strokeStyle = "#000";
 					ctx.lineCap = "round";
 					ctx.lineJoin = "round";
-					ctx.lineWidth = 80;
+					ctx.lineWidth = 60;
 					ctx.miterLimit = 100;
 					ctx.globalAlpha = 0.5;
 					ctx.beginPath();
@@ -66,12 +66,10 @@
 					$card.setStyle("left","-490px");
 				prevSlides.push($card.attr("id"));
 			});
-			
-			x$("ul#cards").addClass("ready");
 
 			var currentSlide = prevSlides.shift();
 
-			console.log( nextSlides.join(", ") + " | " + currentSlide + " | " + prevSlides.join(", ") );
+			console.log( nextSlides.join(" ") + " [" + currentSlide + "] " + prevSlides.join(" ") );
 
 			event.listen("swipeStart",function(){
 				// Canvas time
@@ -82,14 +80,15 @@
 				swipeY = false;
 			});
 			event.listen("swipeMove",function(){
+				var dx = 10*Math.sqrt(touch.dx);
 				if( !swipeX ){
-//					x$("#"+currentSlide).setStyle("left",(10+touch.dx)+"px");
-//					if( prevSlides.length > 0 ){
-//						x$("#"+prevSlides[0]).setStyle("left",(touch.dx-300)+"px");
-//					}
-//					if( nextSlides.length > 0 ){
-//						x$("#"+nextSlides[0]).setStyle("left",(touch.dx+320)+"px");
-//					}
+					x$("#"+currentSlide).setStyle("left",(10+dx)+"px");
+					if( prevSlides.length > 0 ){
+						x$("#"+prevSlides[0]).setStyle("left",(dx-300)+"px");
+					}
+					if( nextSlides.length > 0 ){
+						x$("#"+nextSlides[0]).setStyle("left",(dx+320)+"px");
+					}
 //					x$("#"+currentSlide).setStyle("-webkit-transform","translate("+touch.dx+"px)");
 					if((touch.dx) > 100 ) {
 						swipeX = "left";
@@ -106,7 +105,7 @@
 								x$("#"+nextSlides[0]).css({"left":"320px"});
 								x$("#"+currentSlide).css({"left":"10px"});
 
-								console.log( nextSlides.join(", ") + " | " + currentSlide + " | " + prevSlides.join(", ") );
+								console.log( nextSlides.join(" ") + " [" + currentSlide + "] " + prevSlides.join(" ") );
 							}
 						} else {
 							if( nextSlides.length > 0 ){
@@ -116,7 +115,7 @@
 								x$("#"+prevSlides[0]).css({"left":"-300px"});
 								x$("#"+currentSlide).css({"left":"10px"});
 
-								console.log( nextSlides.join(", ") + " | " + currentSlide + " | " + prevSlides.join(", ") );
+								console.log( nextSlides.join(" ") + " [" + currentSlide + "] " + prevSlides.join(" ") );
 							}
 						}
 					}

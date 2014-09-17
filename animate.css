@@ -1,0 +1,86 @@
+/* @override http://cooper.local/iphone/animate.css */
+
+body{
+	background: #000;
+}
+img.help{
+	position: absolute;
+}
+img#help-h{
+	-webkit-animation-name: helpH;
+	-webkit-animation-duration: 4s;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-transform-origin: 50% 50%;
+	top: 20px;
+	left: 20px;
+	opacity: 0;
+}
+img#help-v{
+	/* Gallery: 40h 101v */
+	-webkit-animation-name: helpV;
+	-webkit-animation-duration: 4s;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-transform-origin: 50% 50%;
+	top: 20px;
+	left: 20px;
+	-webkit-transform: rotate(-90deg);
+	opacity: 0;
+}
+@-webkit-keyframes helpH {
+	0% {
+		-webkit-transform: scale(.8);
+		opacity: 0;
+	}
+	8% {
+		-webkit-transform: scale(1);
+		opacity: 1;
+	}
+	20% {
+		-webkit-transform: rotate(0deg);
+		opacity: 1;
+	}
+	30% {
+		-webkit-transform: rotate(90deg);
+		opacity: 0;
+	}
+	60% {
+		-webkit-transform: rotate(90deg);
+		opacity: 0;
+	}
+	70% {
+		-webkit-transform: rotate(0deg);
+		opacity: 1;
+	}
+	92% {
+		-webkit-transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		-webkit-transform: scale(.8);
+		opacity: 0;
+	}
+}
+@-webkit-keyframes helpV {
+	0% {
+		opacity: 0;
+	}
+	20% {
+		opacity: 0;
+		-webkit-transform: rotate(-90deg);
+	}
+	30% {
+		-webkit-transform: rotate(0deg);
+		opacity: 1;
+	}
+	60% {
+		-webkit-transform: rotate(0deg);	
+		opacity: 1;
+	}
+	70% {
+		-webkit-transform: rotate(-90deg);
+		opacity: 0;
+	}
+	100% {
+		opacity: 0;
+	}
+}

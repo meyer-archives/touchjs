@@ -1,35 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-	"http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
 <html>
 <head>
-	<title>Animation Test</title>
-	<style type="text/css" media="screen">
-		#box{
-			height: 80px;
-			width: 80px;
-			display: block;
-			position: absolute;
-			top: 200px;
-			left: 200px;
-		}
+	<!-- iPhone meta info -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="viewport" content="width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
 
-		#box.animate {
-		 -webkit-animation-duration: 4s;
-		 -webkit-animation-direction: alternate;
-		 -webkit-animation-timing-function: ease-in-out;
-		}
-	</style>
-	<script src="xui.js" type="text/javascript" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
-		x$(window).load(function(){
-			x$('#box').click(function(e){
-				alert("!!!");
-				x$('#box').tween([{ left:100, backgroundColor:'green', duration:.2 }, { right:100 }]).addClass("animate");
-			});
-		});
-	</script>
+	<link rel="apple-touch-startup-image" href="./startup.png">
+	<link rel="apple-touch-icon" href="./apple-touch-icon-precomposed.png"/>
+	<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-precomposed.png"/>
+
+	<title>Animation Test</title>
+
+	<script src="xui-min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="touch.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="animate.css" type="text/css" media="screen" title="" charset="utf-8">
 </head>
 <body>
-	<div id="box" style="background:blue"></div>
+	<img id="help-h" class="help" src="help-h.png">
+	<img id="help-v" class="help" src="help-v.png">
 </body>
 </html>
